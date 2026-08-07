@@ -2,9 +2,13 @@
 // it shows caches and other folders that arent always on surface level, using std::filesystem library
 // functions: directory_iterator recursive_directory_iterator is_directory() file_size()
 // https://en.cppreference.com/cpp/filesystem 
+// 1. learn how to iterate through directories and files using std::filesystem  
+// 2. make a function that takes a directory path and iterates through it, printing out the size of each file and folder
+// 3. make the program run so a user can pick which folder they want to irate through
 #include <iostream>
 #include <filesystem>
 #include <cstdlib>
+
 
 
 using namespace std;
@@ -31,7 +35,7 @@ void checkDir(){
 
     fs::directory_entry Directory{path};
 
-    //Check if it exists
+    /*Check if it exists
     Directory.exists() ? cout <<"location exists\n" : cout <<"location does not exist\n";
 
     //Check if it is a directory
@@ -39,24 +43,25 @@ void checkDir(){
 
     //Check if it is a file
     Directory.is_regular_file() ? cout <<"directory is a file\n" : cout <<"directory is not a file\n";
-
+    */
     //iterate through home directory
     for(auto const & dir_entry : fs::directory_iterator{Directory}){
        // cout << dir_entry.path() << endl;
         //print regular file size
         if(dir_entry.is_regular_file()){
-            cout<< (dir_entry.file_size() / (1024 * 1024 * 1024)) << "gb\n";
-        }else{
+        cout<<  "File:" << dir_entry.path().filename() << endl;        
+        }else
         //print directory
-        printFolder(dir_entry.path());
+        //printFolder(dir_entry.path());
+            cout<< "Folder:" << dir_entry.path().filename() << endl;
         }
-    }   
-}
+
+}   
 
 int main()
 {
+    cout << "< -- Home Repository: " << getenv("HOME") << " -- > \n" << endl;
     checkDir();
-
     return 0;
 
 }

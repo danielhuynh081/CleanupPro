@@ -58,10 +58,29 @@ void checkDir(){
 
 }   
 
+void printFolder(const string dir_path){
+    const fs::path path{dir_path};
+    //ignore trash
+    if(path.filename() == ".Trash") return;
+    
+    cout <<"\n< -- Interating Through Folder: " << dir_path << " -- >\n\n";
+  
+    fs::directory_entry Directory{path};
+    for(auto const & dir_entry : fs::directory_iterator{Directory}){
+        cout << dir_entry.path() << endl;
+       
+    }
+}
+
 int main()
 {
+    string userInput{};
     cout << "< -- Home Repository: " << getenv("HOME") << " -- > \n" << endl;
     checkDir();
+    cout <<"What folder name?" << endl;
+    cin >> userInput;
+    printFolder((getenv("HOME") + ("/" + userInput)));
+
     return 0;
 
 }

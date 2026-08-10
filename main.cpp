@@ -48,7 +48,12 @@ void printFolder(const fs::path dir_path){
 void printFolder(const string dir_path){
     const fs::path path{dir_path};
     //ignore trash
-    if(path.filename() == ".Trash") return;
+    if(path.filename() == ".Trash" ) return;
+    if (!fs::exists(path)) {
+    cout << "Path does not exist.\nPress Enter to continue.\n";
+    cin.get();
+    return;
+}
     
     cout <<"\n< -- Interating Through Folder: " << dir_path << " -- >\n\n";
   
@@ -67,6 +72,9 @@ void printFolder(const string dir_path){
                  << '\n';
         }
     }
+    cout<<"Press Enter to continue."<<endl;
+    cin.get();
+  
 }
 void checkDir(){
     //Get path and set entry to directory
@@ -102,15 +110,25 @@ void checkDir(){
 
 int main()
 {
-    string userInput{};
-    cout << "< -- Home Repository: " << getenv("HOME") << " -- > \n" << endl;
-    checkDir();
-    cout <<"What folder name?" << endl;
-    cin >> userInput;
-    printFolder((getenv("HOME") + ("/" + userInput)));
+    string userInput;
+
+    while (true) {
+        cout << "< -- Home Directory: " << getenv("HOME") << " -- >\n\n";
+
+        checkDir();
+
+        cout << "\nEnter folder name or exit to stop program ";
+        getline(cin >> ws, userInput);
+
+        if (userInput == "exit")
+            break;
+
+        fs::path path = fs::path(getenv("HOME")) / userInput;
+
+        printFolder(path.string());
+    }
 
     return 0;
-
 }
 
 

@@ -143,7 +143,40 @@ vector<fs::path> checkFolder(const fs::path path){
     return files;
 }
 
+//Delete folder
+void deleteAll(fs::path &currentDirectory){
+    cout << "Are you sure you want to delete "
+         << currentDirectory
+         << "? (y/n): ";
 
+    char choice;
+    cin >> choice;
+    cin.ignore();
+
+    if (choice != 'y' && choice != 'Y') {
+        cout << "Deletion cancelled.\n";
+        return;
+    }
+
+    try {
+        for(auto const & dir_entry : fs::directory_iterator{currentDirectory}){
+            
+                fs::remove_all(dir_entry.path());
+            
+        }
+                cout << "Everything deleted.\n";
+                cin.get();
+                cout << "Press Enter to continue.\n";
+
+    }catch(const fs::filesystem_error& e) {
+
+        cout << "Could not delete: "
+             << e.what()
+             << '\n';
+    }
+}
+
+//Delete one file
 void deleteFile(const fs::path& path) {
 
     // Safety checks
@@ -212,6 +245,7 @@ int main()
 
         cout << "\nChoose a file or folder by typing its number";
         cout << "\nType 0 to go back";
+        cout << "\nType -2 to delete all files in this folder";
         cout << "\nType -1 to exit: ";
 
         cin >> userInput;
@@ -229,6 +263,13 @@ int main()
             }
 
             continue;
+        }
+        if(userInput ==-2){
+
+            if(currentDirectory != homeDirectory){
+                deleteAll(currentDirectory);
+
+            }
         }
 
 

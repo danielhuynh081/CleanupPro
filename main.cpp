@@ -11,11 +11,11 @@
 #include <cstdlib>
 #include <vector>
 
-
 using namespace std;
 
 namespace fs = filesystem;
 const fs::path homeDirectory{getenv("HOME")};
+
 
 string formatSize(uintmax_t bytes) {
     const double KB = 1024.0;
@@ -32,6 +32,7 @@ string formatSize(uintmax_t bytes) {
         return to_string(bytes) + " bytes";
 }
 
+
 /*
 void printFolder(const fs::path dir_path){
     //ignore trash
@@ -40,15 +41,17 @@ void printFolder(const fs::path dir_path){
     cout <<"\n< -- Interating Through Folder: " << dir_path << " -- >\n\n";
 
     fs::directory_entry Directory{dir_path};
+
     for(auto const & dir_entry : fs::directory_iterator{Directory}){
         cout << dir_entry.path() << endl;
-       
     }
 }
 */
 
+
 void printFolder(const fs::path path){
-    //   const fs::path path{dir_path};
+    // const fs::path path{dir_path};
+
     //ignore trash
     if(path.filename() == ".Trash" ) return;
 
@@ -60,7 +63,9 @@ void printFolder(const fs::path path){
 
     cout <<"\n< -- Interating Through Folder: " << path << " -- >\n\n";
 
+
     for(auto const & dir_entry : fs::directory_iterator{path}){
+
         if (dir_entry.is_regular_file()) {
             cout << "File: "
                  << dir_entry.path().filename()
@@ -68,6 +73,7 @@ void printFolder(const fs::path path){
                  << formatSize(dir_entry.file_size())
                  << '\n';
         }
+
         else if (dir_entry.is_directory()) {
             cout << "Folder: "
                  << dir_entry.path().filename()
@@ -77,10 +83,12 @@ void printFolder(const fs::path path){
 }
 
 
-vector<fs::path> checkHome(){
+vector<fs::path> checkFolder(const fs::path path){
+
     //Get path and set entry to directory
     // const fs::path path{R"(/Users/danielhuynh)"};
-    fs::directory_entry Directory{homeDirectory};
+
+    fs::directory_entry Directory{path};
 
     /*
     Check if it exists
@@ -97,28 +105,37 @@ vector<fs::path> checkHome(){
 
     int count = 1;
 
-    //iterate through home directory
+    //iterate through directory
     for(auto const & dir_entry : fs::directory_iterator{Directory}){
+
         // cout << dir_entry.path() << endl;
 
         //ignore trash
         if(dir_entry.path().filename() == ".Trash")
             continue;
 
-        //save the path
         files.push_back(dir_entry.path());
 
         //print regular file size
         if(dir_entry.is_regular_file()){
-            cout << count << ". File:"
+
+            cout << count
+                 << ". File:"
                  << dir_entry.path().filename()
+                 << " | "
+                 << formatSize(dir_entry.file_size())
                  << endl;
-        }else
+
+        }else{
+
             //print directory
             //printFolder(dir_entry.path());
-            cout << count << ". Folder:"
+
+            cout << count
+                 << ". Folder:"
                  << dir_entry.path().filename()
                  << endl;
+        }
 
         count++;
     }
@@ -128,9 +145,16 @@ vector<fs::path> checkHome(){
 
 
 void deleteFile(const fs::path& path) {
+
     // Safety checks
     if (!fs::exists(path)) {
-        cout << "File or folder does not exist.\n";
+        cout << "File does not exist.\n";
+        return;
+    }
+
+    //dont delete folders
+    if(fs::is_directory(path)){
+        cout << "Cannot delete folders yet.\n";
         return;
     }
 
@@ -153,18 +177,18 @@ void deleteFile(const fs::path& path) {
     }
 
     try {
-        if (fs::is_directory(path)) {
-            uintmax_t removed = fs::remove_all(path);
-            cout << "Deleted folder and " << removed
-                 << " items.\n";
-        }
-        else {
-            fs::remove(path);
-            cout << "File deleted.\n";
-        }
+
+        fs::remove(path);
+
+        cout << "File deleted.\n";
+
     }
+
     catch (const fs::filesystem_error& e) {
-        cout << "Could not delete: " << e.what() << '\n';
+
+        cout << "Could not delete: "
+             << e.what()
+             << '\n';
     }
 }
 
@@ -173,31 +197,71 @@ int main()
 {
     int userInput;
 
+    //start at home directory
+    fs::path currentDirectory = homeDirectory;
+
     while (true) {
-        cout << "< -- Home Directory: " << homeDirectory << " -- >\n\n";
 
-        vector<fs::path> files = checkHome();
+        cout << "\n< -- Current Directory: "
+             << currentDirectory
+             << " -- >\n\n";
 
-        cout << "\nDelete a file or folder by typing its number (or type 0 to quit): ";
+
+        vector<fs::path> files = checkFolder(currentDirectory);
+
+
+        cout << "\nChoose a file or folder by typing its number";
+        cout << "\nType 0 to go back";
+        cout << "\nType -1 to exit: ";
+
         cin >> userInput;
 
-        if (userInput == 0)
+
+        if(userInput == -1)
             break;
 
-        if(userInput < 1 || userInput > files.size()){
-            cout << "Invalid choice." << endl;
+
+        //go back one folder
+        if(userInput == 0){
+
+            if(currentDirectory != homeDirectory){
+                currentDirectory = currentDirectory.parent_path();
+            }
+
             continue;
         }
 
+
+        if(userInput < 1 || userInput > files.size()){
+
+            cout << "Invalid choice." << endl;
+
+            continue;
+        }
+
+
         fs::path selectedFile = files[userInput - 1];
 
-        deleteFile(selectedFile);
+
+        //if folder, go inside folder
+        if(fs::is_directory(selectedFile)){
+
+            currentDirectory = selectedFile;
+
+        }
+
+        //if file, ask user if they want to delete
+        else{
+
+            deleteFile(selectedFile);
+
+        }
+
 
         //fs::path path = fs::path(getenv("HOME")) / userInput;
 
         //   printFolder(path.string());
-        cout<<"Press Enter to continue."<<endl;
-        cin.get();
+
     }
 
     return 0;

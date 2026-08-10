@@ -15,6 +15,7 @@
 using namespace std;
 
 namespace fs = filesystem;
+const fs::path homeDirectory{getenv("HOME")};
 
 
 string formatSize(uintmax_t bytes) {
@@ -45,17 +46,17 @@ void printFolder(const fs::path dir_path){
     }
 }
 */
-void printFolder(const string dir_path){
-    const fs::path path{dir_path};
+void printFolder(const fs::path path){
+ //   const fs::path path{dir_path}; 
     //ignore trash
     if(path.filename() == ".Trash" ) return;
     if (!fs::exists(path)) {
-    cout << "Path does not exist.\nPress Enter to continue.\n";
+    cout << path << "Path does not exist.\nPress Enter to continue.\n";
     cin.get();
     return;
 }
     
-    cout <<"\n< -- Interating Through Folder: " << dir_path << " -- >\n\n";
+    cout <<"\n< -- Interating Through Folder: " << path << " -- >\n\n";
   
 
     for(auto const & dir_entry : fs::directory_iterator{path}){
@@ -72,16 +73,11 @@ void printFolder(const string dir_path){
                  << '\n';
         }
     }
-    cout<<"Press Enter to continue."<<endl;
-    cin.get();
-  
 }
-void checkDir(){
+void checkHome(){
     //Get path and set entry to directory
    // const fs::path path{R"(/Users/danielhuynh)"};
-    const fs::path path{getenv("HOME")};
-
-    fs::directory_entry Directory{path};
+    fs::directory_entry Directory{homeDirectory};
 
     /*Check if it exists
     Directory.exists() ? cout <<"location exists\n" : cout <<"location does not exist\n";
@@ -106,6 +102,32 @@ void checkDir(){
 
 }   
 
+void deletefile(){
+    string userInput;
+    fs::path path{};
+
+    printFolder(homeDirectory);
+    cout << "\ntype filename to delete or folder to step into ";
+    getline(cin >> ws, userInput);
+
+    path = fs::path(getenv("HOME")) / userInput;
+
+    fs::directory_entry Directory{path};
+     if(Directory.is_regular_file()){
+        cout<<  "File:" << path << endl;        
+        }else{
+        //print directory
+        //printFolder(dir_entry.path());
+            cout<< "Folder:" << path << endl;
+        }
+
+
+
+
+
+
+   
+}
 
 
 int main()
@@ -113,19 +135,23 @@ int main()
     string userInput;
 
     while (true) {
-        cout << "< -- Home Directory: " << getenv("HOME") << " -- >\n\n";
+        cout << "< -- Home Directory: " << homeDirectory << " -- >\n\n";
 
-        checkDir();
+        checkHome();
 
-        cout << "\nEnter folder name or exit to stop program ";
+        cout << "\nDelete a file or folder by typing its name (or type 'exit' to quit): ";
         getline(cin >> ws, userInput);
 
         if (userInput == "exit")
             break;
+        if (userInput == "delete")
+            deletefile();
 
-        fs::path path = fs::path(getenv("HOME")) / userInput;
+        //fs::path path = fs::path(getenv("HOME")) / userInput;
 
-        printFolder(path.string());
+     //   printFolder(path.string());
+        cout<<"Press Enter to continue."<<endl;
+        cin.get();
     }
 
     return 0;

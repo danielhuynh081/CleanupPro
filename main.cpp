@@ -164,7 +164,7 @@ void deleteAll(fs::path &currentDirectory){
                 fs::remove_all(dir_entry.path());
             
         }
-                cout << "Everything deleted.\n";
+                cout << "Folder has been deleted.\n";
                 cin.get();
                 cout << "Press Enter to continue.\n";
 
@@ -173,6 +173,13 @@ void deleteAll(fs::path &currentDirectory){
         cout << "Could not delete: "
              << e.what()
              << '\n';
+    }
+}
+
+void selectDelete(const fs::path& path, vector<int> files){
+
+    for(int i = 0; i < files.size(); i++){
+        //fs::path selectedFile = files[userInput - 1]; loop through file number array and delete paths to each one
     }
 }
 
@@ -245,13 +252,14 @@ int main()
 
         cout << "\nChoose a file or folder by typing its number";
         cout << "\nType 0 to go back";
+        cout << "\nType -1 to select multiple files to delete";
         cout << "\nType -2 to delete all files in this folder";
-        cout << "\nType -1 to exit: ";
+        cout << "\nType -3 to exit: ";
 
         cin >> userInput;
 
 
-        if(userInput == -1)
+        if(userInput == -3)
             break;
 
 
@@ -270,6 +278,30 @@ int main()
                 deleteAll(currentDirectory);
 
             }
+        }
+        if(userInput == -1){
+            
+            cout << "Enter the numbers of the files you want to delete, separated by spaces (e.g., 1 3 5): ";
+            cin.ignore(); // Clear the newline character from the input buffer
+            string line;
+            getline(cin, line);
+            istringstream iss(line);
+            vector<int> selectedFiles;
+            int num;
+            while (iss >> num) {
+                if (num >= 1 && num <= files.size()) {
+                    selectedFiles.push_back(num);
+                } else {
+                    cout << "Invalid file number: " << num << endl;
+                }
+            }
+
+            for (int index : selectedFiles) {
+                fs::path selectedFile = files[index - 1];
+                deleteFile(selectedFile);
+            }
+
+            continue;
         }
 
 

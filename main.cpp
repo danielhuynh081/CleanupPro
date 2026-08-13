@@ -12,20 +12,14 @@ const fs::path homeDirectory{getenv("HOME")};
 
 int main()
 {
-    int userInput;
+    int userInput{};
 
     //start at home directory
     fs::path currentDirectory = homeDirectory;
 
     while (true) {
-
-        cout << "\n< -- Current Directory: "
-             << currentDirectory
-             << " -- >\n\n";
-
-
+        cout << "\n< -- Current Directory: " << currentDirectory << " -- >\n\n";
         vector<fs::path> files = checkFolder(currentDirectory);
-
 
         cout << "\nChoose a file or folder by typing its number";
         cout << "\nType 0 to go back";
@@ -35,29 +29,22 @@ int main()
 
         cin >> userInput;
 
+        //Error Handling
+        if (userInput < 1 || userInput > static_cast<int>(files.size())){
+            cout << "Invalid choice." << endl;
+            continue;
+        }
 
-        if(userInput == -3)
-            break;
-
-
-        //go back one folder
+        //Return to parent folder
         if(userInput == 0){
-
             if(currentDirectory != homeDirectory){
                 currentDirectory = currentDirectory.parent_path();
             }
-
             continue;
         }
-        if(userInput ==-2){
 
-            if(currentDirectory != homeDirectory){
-                deleteAll(currentDirectory);
-
-            }
-        }
+        //Delete Multiple Files
         if(userInput == -1){
-            
             cout << "Enter the numbers of the files you want to delete, separated by spaces (e.g., 1 3 5): ";
             cin.ignore(); // Clear the newline character from the input buffer
             string line;
@@ -77,21 +64,21 @@ int main()
                 fs::path selectedFile = files[index - 1];
                 deleteFile(selectedFile);
             }
-
             continue;
         }
-
-
-        if (userInput < 1 || userInput > static_cast<int>(files.size())){
-
-            cout << "Invalid choice." << endl;
-
-            continue;
+        
+        //Delete All Files in Folder
+        if(userInput ==-2){
+            if(currentDirectory != homeDirectory){
+                deleteAll(currentDirectory);
+            }
         }
 
+        //Exit program
+        if(userInput == -3) break;
 
+        //Get the selected file or folder from userInput
         fs::path selectedFile = files[userInput - 1];
-
 
         //if folder, go inside folder
         if(fs::is_directory(selectedFile)){

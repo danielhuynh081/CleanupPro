@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <cstdlib>
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -318,7 +319,13 @@ int main()
 
         //if folder, go inside folder
         if(fs::is_directory(selectedFile)){
-
+            cout <<"press 1 to go inside folder, press 2 to delete folder: ";
+            cin >> userInput;
+            if(userInput == 2){
+                deleteAll(selectedFile);
+                fs::remove(selectedFile);
+                continue;
+            }
             currentDirectory = selectedFile;
 
         }

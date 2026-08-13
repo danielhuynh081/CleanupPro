@@ -1,4 +1,4 @@
-#include "members.h"
+#include "class.h"
 
 
 
@@ -162,13 +162,13 @@ void deleteAll(fs::path &currentDirectory){
 }
 
 //Delete multiple files
-void selectDelete(const fs::path& path, vector<int> files){
+/*void selectDelete(const fs::path& path, vector<int> files){
 
     for(int i = 0; i < files.size(); i++){
         //fs::path selectedFile = files[userInput - 1]; loop through file number array and delete paths to each one
     }
 }
-
+*/
 //Delete one file
 void deleteFile(const fs::path& path) {
 

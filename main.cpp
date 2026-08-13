@@ -5,7 +5,7 @@
 // 1. learn how to iterate through directories and files using std::filesystem
 // 2. make a function that takes a directory path and iterates through it, printing out the size of each file and folder
 // 3. make the program run so a user can pick which folder they want to irate through
-#include "members.h"
+#include "class.h"
 
 //Home directory
 const fs::path homeDirectory{getenv("HOME")};
@@ -66,7 +66,7 @@ int main()
             vector<int> selectedFiles;
             int num;
             while (iss >> num) {
-                if (num >= 1 && num <= files.size()) {
+                if (num >= 1 && num <= static_cast<int>(files.size())) {
                     selectedFiles.push_back(num);
                 } else {
                     cout << "Invalid file number: " << num << endl;
@@ -82,7 +82,7 @@ int main()
         }
 
 
-        if(userInput < 1 || userInput > files.size()){
+        if (userInput < 1 || userInput > static_cast<int>(files.size())){
 
             cout << "Invalid choice." << endl;
 

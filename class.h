@@ -9,13 +9,20 @@
 using namespace std;
 namespace fs = filesystem;
 
+//Struct for each file/folder entry
+struct Entry {
+    fs::path path;
+    uintmax_t size;
+    bool isDirectory;
+};
+
 //Formatting
 string formatSize(uintmax_t bytes);
 uintmax_t getFolderSize(fs::path path);
 
 //Displaying
 void printFolder(const fs::path& path);
-vector<fs::path> checkFolder(const fs::path& path);
+vector<Entry> checkFolder(const fs::path& path);
 
 //Deleting
 void deleteAll(fs::path& currentDirectory);

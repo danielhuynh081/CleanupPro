@@ -125,6 +125,7 @@ vector<fs::path> checkFolder(const fs::path &path){
         count++;
     }
 
+    //Return vector of file and folder paths
     return files;
 }
 

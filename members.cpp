@@ -53,14 +53,12 @@ vector<Entry> checkFolder(const fs::path &path){
         entry.path = dir_entry.path();
         entry.isDirectory = dir_entry.is_directory();
         if(dir_entry.is_regular_file()){
-
-        
             entry.size = dir_entry.file_size();
         }
         else{
             entry.size=0;
            // idx.size = getFolderSize(dir_entry.path());
-    }
+        }
         files.push_back(entry);
 
     }

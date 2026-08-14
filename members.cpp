@@ -33,7 +33,45 @@ void printFolder(const fs::path dir_path){
 }
 */
 
-//Display
+
+
+//Display folder contents as user selects folder
+vector<Entry> checkFolder(const fs::path &path){
+    //Create vector for list of files
+    vector<Entry> files;
+
+    //iterate through directory
+    for(auto const & dir_entry : fs::directory_iterator{path}){
+
+        // cout << dir_entry.path() << endl;
+
+        //ignore trash
+        if(dir_entry.path().filename() == ".Trash")
+            continue;
+        
+        Entry entry;
+        entry.path = dir_entry.path();
+        entry.isDirectory = dir_entry.is_directory();
+        if(dir_entry.is_regular_file()){
+
+        
+            entry.size = dir_entry.file_size();
+        }
+        else{
+            entry.size=0;
+           // idx.size = getFolderSize(dir_entry.path());
+    }
+        files.push_back(entry);
+
+    }
+
+    //Return vector of file and folder paths
+    return files;
+}
+
+//Display Folders
+
+/*
 void printFolder(const fs::path path){
     // const fs::path path{dir_path};
 
@@ -66,68 +104,32 @@ void printFolder(const fs::path path){
         }
     }
 }
-
-//Display folder contents as user selects folder
-vector<fs::path> checkFolder(const fs::path &path){
-
-    //Get path and set entry to directory
-    // const fs::path path{R"(/Users/danielhuynh)"};
-
-    fs::directory_entry Directory{path};
-
-    /*
-    Check if it exists
-    Directory.exists() ? cout <<"location exists\n" : cout <<"location does not exist\n";
-
-    //Check if it is a directory
-    Directory.is_directory() ? cout <<"directory is a directory\n" : cout <<"directory is not a directory\n";
-
-    //Check if it is a file
-    Directory.is_regular_file() ? cout <<"directory is a file\n" : cout <<"directory is not a file\n";
-    */
-
-    vector<fs::path> files;
-
+*/
+void displayFolder(const vector<Entry> &files){
+    
     int count = 1;
 
-    //iterate through directory
-    for(auto const & dir_entry : fs::directory_iterator{Directory}){
-
-        // cout << dir_entry.path() << endl;
-
-        //ignore trash
-        if(dir_entry.path().filename() == ".Trash")
-            continue;
-
-        files.push_back(dir_entry.path());
-
-        //print regular file size
-        if(dir_entry.is_regular_file()){
-
+    for(auto const & file : files){
+        if (file.isDirectory)
+            {
+                cout << count
+                    << ". Folder: "
+                    << file.path.filename()
+                    << '\n';
+            }
+        else
+        {
             cout << count
-                 << ". File:"
-                 << dir_entry.path().filename()
-                 << " | "
-                 << formatSize(dir_entry.file_size())
-                 << endl;
-
-        }else{
-
-            //print directory
-            //printFolder(dir_entry.path());
-
-            cout << count
-                 << ". Folder:"
-                 << dir_entry.path().filename()
-                 << endl;
+                << ". File: "
+                << file.path.filename()
+                << " | "
+                << formatSize(file.size)
+                << '\n';
         }
-
-        count++;
+    count++;    
     }
-
-    //Return vector of file and folder paths
-    return files;
 }
+
 
 //Delete folder
 void deleteAll(fs::path &currentDirectory){

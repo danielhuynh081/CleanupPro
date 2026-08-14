@@ -19,7 +19,9 @@ int main()
 
     while (true) {
         cout << "\n< -- Current Directory: " << currentDirectory << " -- >\n\n";
-        vector<fs::path> files = checkFolder(currentDirectory);
+        vector<Entry> files = checkFolder(currentDirectory);
+
+        displayFolder(files);
 
         cout << "\nChoose a file or folder by typing its number";
         cout << "\nType 0 to go back";
@@ -28,12 +30,6 @@ int main()
         cout << "\nType -3 to exit: ";
 
         cin >> userInput;
-
-        //Error Handling
-        if (userInput < 1 || userInput > static_cast<int>(files.size())){
-            cout << "Invalid choice." << endl;
-            continue;
-        }
 
         //Return to parent folder
         if(userInput == 0){
@@ -46,12 +42,16 @@ int main()
         //Delete Multiple Files
         if(userInput == -1){
             cout << "Enter the numbers of the files you want to delete, separated by spaces (e.g., 1 3 5): ";
-            cin.ignore(); // Clear the newline character from the input buffer
+            cin.ignore();
+
             string line;
             getline(cin, line);
+
             istringstream iss(line);
+
             vector<int> selectedFiles;
             int num;
+
             while (iss >> num) {
                 if (num >= 1 && num <= static_cast<int>(files.size())) {
                     selectedFiles.push_back(num);
@@ -61,52 +61,57 @@ int main()
             }
 
             for (int index : selectedFiles) {
-                fs::path selectedFile = files[index - 1];
+                fs::path selectedFile = files[index - 1].path;
                 deleteFile(selectedFile);
             }
+
             continue;
         }
-        
+
         //Delete All Files in Folder
-        if(userInput ==-2){
+        if(userInput == -2){
             if(currentDirectory != homeDirectory){
                 deleteAll(currentDirectory);
             }
+            continue;
         }
 
         //Exit program
-        if(userInput == -3) break;
+        if(userInput == -3)
+            break;
+
+        //Error Handling
+        if (userInput < 1 || userInput > static_cast<int>(files.size())){
+            cout << "Invalid choice." << endl;
+            continue;
+        }
 
         //Get the selected file or folder from userInput
-        fs::path selectedFile = files[userInput - 1];
+        Entry selection = files[userInput - 1];
 
         //if folder, go inside folder
-        if(fs::is_directory(selectedFile)){
-            cout <<"press 1 to go inside folder, press 2 to delete folder: ";
+        if(selection.isDirectory){
+            cout << "Press 1 to go inside folder, press 2 to delete folder: ";
             cin >> userInput;
+
             if(userInput == 2){
-                deleteAll(selectedFile);
-                fs::remove(selectedFile);
+                deleteAll(selection.path);
+                fs::remove(selection.path);
                 continue;
             }
-            currentDirectory = selectedFile;
 
+            currentDirectory = selection.path;
         }
 
         //if file, ask user if they want to delete
         else{
-
-            deleteFile(selectedFile);
-
+            deleteFile(selection.path);
         }
-
 
         //fs::path path = fs::path(getenv("HOME")) / userInput;
 
-        //   printFolder(path.string());
-
+        //printFolder(path.string());
     }
 
     return 0;
 }
-

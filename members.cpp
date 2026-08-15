@@ -11,10 +11,8 @@ string formatSize(uintmax_t bytes) {
         return to_string(bytes / GB) + " GB";
     else if (bytes >= MB)
         return to_string(bytes / MB) + " MB";
-    else if (bytes >= KB)
-        return to_string(bytes / KB) + " KB";
     else
-        return to_string(bytes) + " bytes";
+        return to_string(bytes / KB) + " KB";
 }
 
 
@@ -103,9 +101,12 @@ void printFolder(const fs::path path){
     }
 }
 */
-void displayFolder(const vector<Entry> &files){
+void displayFolder( vector<Entry> &files){
     
     int count = 1;
+    sort(files.begin(), files.end(), [](const Entry& a, const Entry& b) {
+        return a.size > b.size;
+    });
 
     for(auto const & file : files){
         if (file.isDirectory)

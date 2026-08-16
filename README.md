@@ -11,6 +11,7 @@ CleanupPro is a personal C++ project I built to learn how to use std::filesystem
 - Delete individual files
 - Delete everything inside a folder with confirmation prompts
 - Ignore system folders such as `.Trash`
+- Sort folders by largest size
 
 ## Built With
 
@@ -36,7 +37,6 @@ This project is still a work in progress. Some features I'd like to add include:
 - Multithreadding
 - A GUI interface
 - Calculate total folder sizes recursively
-- Sort folders by largest size
 - Move deleted files to the system Trash instead of permanently deleting them
 - Find the largest files on the system
 - Search for files over a user-defined size

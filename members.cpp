@@ -244,12 +244,14 @@ void printFolder(const fs::path path){
 
 void displayFolder( vector<Entry> &files){
     int count{1};
+    const uintmax_t MIN_SIZE = 5 * 1024 * 1024; // 5 MB
     
     sort(files.begin(), files.end(), [](const Entry& a, const Entry& b) {
         return a.size > b.size;
     });
 
     for(auto const & file : files){
+        if (file.size < MIN_SIZE) continue;
         if (file.isDirectory)
             {
                 cout << count

@@ -25,11 +25,9 @@ int main()
         auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
         cout << "\nScan completed in " << duration.count()/1000 << " seconds\n";
 
-        cout << "\nChoose a file or folder by typing its number";
-        cout << "\nType 0 to go back";
-        cout << "\nType -1 to select multiple files to delete";
-        cout << "\nType -2 to delete all files in this folder";
-        cout << "\nType -3 to exit: ";
+        cout << "\nChoose a file or folder by typing its number or select option below";
+        cout << "\n( 0 ) Return to previuos folder | ( -1 ) select multiple files to delete | ( -2 ) delete all files in this folder | ( -3 ) Close Program " << endl;
+    
 
         cin >> userInput;
 

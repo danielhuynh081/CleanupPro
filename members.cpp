@@ -29,7 +29,7 @@ const vector<fs::path> protectedPaths = {
 const vector<fs::path> dontDelete {
     homeDirectory / "Library"
 };
-
+unordered_map<fs::path, vector<Entry>> folderCache;
 
 string formatSize(uintmax_t bytes) {
     const double KB = 1024.0;
@@ -112,6 +112,11 @@ bool shouldSkipDelete(const fs::path& path)
 
 //Display folder contents as user selects folder
 vector<Entry> checkFolder(const fs::path &path){
+    // Cache first scan
+    auto it = folderCache.find(path);
+    if (it != folderCache.end())
+        return it->second;
+    
     //Create vector for list of files
     vector<Entry> files;
 
@@ -137,6 +142,8 @@ vector<Entry> checkFolder(const fs::path &path){
         files.push_back(entry);
 
     }
+    //Save to cache
+    folderCache[path] = files;
 
     //Return vector of file and folder paths
     return files;

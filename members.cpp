@@ -1,6 +1,35 @@
 #include "class.h"
 
 
+const vector<fs::path> protectedPaths = {
+    homeDirectory / ".Trash",
+    homeDirectory / "Library/Application Support",
+    homeDirectory / "Library/Containers",
+    homeDirectory / "Library/Group Containers",
+    homeDirectory / "Library/CloudStorage",
+    homeDirectory / "Library/Keychains",
+    homeDirectory / "Library/Mail",
+    homeDirectory / "Library/Messages",
+    homeDirectory / "Library/Safari",
+    homeDirectory / "Library/Preferences",
+    homeDirectory / "Library/IdentityServices",
+    homeDirectory / "Library/Accounts",
+    homeDirectory / "Library/Calendars",
+    homeDirectory / "Library/Contacts",
+    homeDirectory / "Library/AddressBook",
+    homeDirectory / "Library/Cookies",
+    homeDirectory / "Library/HomeKit",
+    homeDirectory / "Library/Passes",
+    homeDirectory / "Library/PersonalizationPortrait",
+    homeDirectory / "Library/Reminders",
+    homeDirectory / "Library/VoiceTrigger",
+    homeDirectory / "Library/Metadata",
+    homeDirectory / "Library/Application Scripts"
+};
+const vector<fs::path> dontDelete {
+    homeDirectory / "Library"
+};
+
 
 string formatSize(uintmax_t bytes) {
     const double KB = 1024.0;
@@ -30,8 +59,56 @@ void printFolder(const fs::path dir_path){
     }
 }
 */
+uintmax_t getFolderSize(fs::path path){
+ 
+    if (!fs::is_directory(path))
+        return 0;
 
+    uintmax_t size{0};
 
+    try
+    {   
+        for (const auto& dir_entry : fs::directory_iterator(path))
+        {
+            if (shouldSkip(dir_entry.path()))
+                continue;
+
+            if (dir_entry.is_regular_file())
+                size += dir_entry.file_size();
+
+            else if (dir_entry.is_directory())
+                size += getFolderSize(dir_entry.path());
+        }
+    }
+    catch (const fs::filesystem_error&)
+    {
+        return size;
+    }
+
+    return size;
+}
+
+bool shouldSkip(const fs::path& path)
+{
+    for (const auto& p : protectedPaths)
+    {
+        if (path == p)
+            return true;
+    }
+
+    return false;
+}
+
+bool shouldSkipDelete(const fs::path& path)
+{
+    for (const auto& p : dontDelete)
+    {
+        if (path == p)
+            return true;
+    }
+
+    return false;
+}
 
 //Display folder contents as user selects folder
 vector<Entry> checkFolder(const fs::path &path){
@@ -44,7 +121,7 @@ vector<Entry> checkFolder(const fs::path &path){
         // cout << dir_entry.path() << endl;
 
         //ignore trash
-        if(dir_entry.path().filename() == ".Trash")
+        if(shouldSkip(dir_entry.path()))
             continue;
         
         Entry entry;
@@ -54,7 +131,7 @@ vector<Entry> checkFolder(const fs::path &path){
             entry.size = dir_entry.file_size();
         }
         else{
-            entry.size=0;
+            entry.size= getFolderSize(dir_entry.path());
            // idx.size = getFolderSize(dir_entry.path());
         }
         files.push_back(entry);
@@ -101,6 +178,7 @@ void printFolder(const fs::path path){
     }
 }
 */
+
 void displayFolder( vector<Entry> &files){
     
     int count = 1;
@@ -114,6 +192,9 @@ void displayFolder( vector<Entry> &files){
                 cout << count
                     << ". Folder: "
                     << file.path.filename()
+                    << " | "
+                    << formatSize(file.size)
+       //             << formatSize(file.size);
                     << '\n';
             }
         else
@@ -132,11 +213,15 @@ void displayFolder( vector<Entry> &files){
 
 //Delete folder
 void deleteAll(fs::path &currentDirectory){
-    cout << "Are you sure you want to delete "
-         << currentDirectory
-         << "? (y/n): ";
+    char choice{};
 
-    char choice;
+    if (shouldSkip(currentDirectory) || shouldSkipDelete(currentDirectory)) {
+        cout << "This folder is protected and cannot be deleted.\n";
+        return;
+    }   
+    
+    cout << "Are you sure you want to delete " << currentDirectory << "? (y/n): ";
+
     cin >> choice;
     cin.ignore();
 
@@ -147,13 +232,13 @@ void deleteAll(fs::path &currentDirectory){
 
     try {
         for(auto const & dir_entry : fs::directory_iterator{currentDirectory}){
-            
                 fs::remove_all(dir_entry.path());
-            
         }
-                cout << "Folder has been deleted.\n";
-                cin.get();
-                cout << "Press Enter to continue.\n";
+        
+        fs::remove(currentDirectory);
+        cout << "Folder has been deleted.\n";
+        cin.get();
+        cout << "Press Enter to continue.\n";
 
     }catch(const fs::filesystem_error& e) {
 
@@ -173,8 +258,11 @@ void deleteAll(fs::path &currentDirectory){
 */
 //Delete one file
 void deleteFile(const fs::path& path) {
-
     // Safety checks
+    if (shouldSkip(path) || shouldSkipDelete(path)) {
+        cout << "This folder is protected and cannot be deleted.\n";
+        return;
+    }
     if (!fs::exists(path)) {
         cout << "File does not exist.\n";
         return;

@@ -7,8 +7,6 @@
 // 3. make the program run so a user can pick which folder they want to irate through
 #include "class.h"
 
-//Home directory
-const fs::path homeDirectory{getenv("HOME")};
 
 int main()
 {
@@ -96,11 +94,13 @@ int main()
 
             if(userInput == 2){
                 deleteAll(selection.path);
-                fs::remove(selection.path);
                 continue;
+            }else if(userInput ==1){
+                currentDirectory = selection.path;
+            }else{
+                cout << "\nInvalid Option" << endl;
             }
 
-            currentDirectory = selection.path;
         }
 
         //if file, ask user if they want to delete

@@ -14,6 +14,7 @@ CleanupPro is a personal C++ project I built to learn how to use std::filesystem
 - Sort folders by largest size
 - Calculate total folder sizes recursively
 - Cached folders after scans to prevent double scanning
+- multithreadded using #include<thread> bringing initial scan time from 22 seconds to 6 seconds
 
 ## Built With
 

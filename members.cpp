@@ -110,7 +110,7 @@ bool shouldSkipDelete(const fs::path& path)
     return false;
 }
 
-//Display folder contents as user selects folder
+/*Display folder contents as user selects folder
 vector<Entry> checkFolder(const fs::path &path){
     // Cache first scan
     auto it = folderCache.find(path);
@@ -148,7 +148,63 @@ vector<Entry> checkFolder(const fs::path &path){
     //Return vector of file and folder paths
     return files;
 }
+*/
+vector<Entry> checkFolder(const fs::path& path)
+{
+    vector<Entry> files;
+    vector<thread> threads;
+    
+    // Check cache first
+    auto it = folderCache.find(path);
+    if (it != folderCache.end())
+        return it->second;
 
+
+    // Read directory entries wihtout size
+    for (const auto& dir_entry : fs::directory_iterator(path))
+    {
+        if (shouldSkip(dir_entry.path()))
+            continue;
+
+        Entry entry;
+        entry.path = dir_entry.path();
+        entry.isDirectory = dir_entry.is_directory();
+        entry.size = 0;
+
+        files.push_back(entry);
+    }
+
+    // get available threads
+    unsigned int numThreads = thread::hardware_concurrency();
+
+    if (numThreads == 0)
+        numThreads = 8;
+
+    // create threads
+    for (unsigned int id = 0; id < numThreads; ++id)
+    {   
+        //function for each thread
+        threads.emplace_back([&files, id, numThreads]()
+        {
+            for (size_t i = id; i < files.size(); i += numThreads)
+            {
+                if (files[i].isDirectory)
+                    files[i].size = getFolderSize(files[i].path);
+                else
+                    files[i].size = fs::file_size(files[i].path);
+            }
+        });
+    }
+
+    // Wait for all threads
+    for (auto& t : threads)
+        t.join();
+
+    // Cache results
+    folderCache[path] = files;
+
+    return files;
+}
 //Display Folders
 
 /*
@@ -187,8 +243,8 @@ void printFolder(const fs::path path){
 */
 
 void displayFolder( vector<Entry> &files){
+    int count{1};
     
-    int count = 1;
     sort(files.begin(), files.end(), [](const Entry& a, const Entry& b) {
         return a.size > b.size;
     });
@@ -201,18 +257,17 @@ void displayFolder( vector<Entry> &files){
                     << file.path.filename()
                     << " | "
                     << formatSize(file.size)
-       //             << formatSize(file.size);
                     << '\n';
             }
         else
-        {
-            cout << count
-                << ". File: "
-                << file.path.filename()
-                << " | "
-                << formatSize(file.size)
-                << '\n';
-        }
+            {
+                cout << count
+                    << ". File: "
+                    << file.path.filename()
+                    << " | "
+                    << formatSize(file.size)
+                    << '\n';
+            }
     count++;    
     }
 }

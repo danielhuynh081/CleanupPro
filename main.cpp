@@ -17,9 +17,13 @@ int main()
 
     while (true) {
         cout << "\n< -- Current Directory: " << currentDirectory << " -- >\n\n";
+        auto start = chrono::high_resolution_clock::now();
+       
         vector<Entry> files = checkFolder(currentDirectory);
-
         displayFolder(files);
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+        cout << "\nScan completed in " << duration.count()/1000 << " seconds\n";
 
         cout << "\nChoose a file or folder by typing its number";
         cout << "\nType 0 to go back";

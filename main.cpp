@@ -26,8 +26,7 @@ int main()
         cout << "\nScan completed in " << duration.count()/1000 << " seconds\n";
 
         cout << "\nChoose a file or folder by typing its number or select option below";
-        cout << "\n( 0 ) Return to previuos folder | ( -1 ) select multiple files to delete | ( -2 ) delete all files in this folder | ( -3 ) Close Program " << endl;
-    
+        cout << "\n( 0 ) Return to previuos folder | ( -1 ) select multiple files to delete | ( -2 ) delete all files in this folder | ( -3 ) Exit Program " << endl;
 
         cin >> userInput;
 

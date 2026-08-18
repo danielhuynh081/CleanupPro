@@ -17,16 +17,12 @@ int main()
 
     while (true) {
         cout << "\n< -- Current Directory: " << currentDirectory << " -- >\n\n";
-        auto start = chrono::high_resolution_clock::now();
        
         vector<Entry> files = checkFolder(currentDirectory);
         displayFolder(files);
-        auto end = chrono::high_resolution_clock::now();
-        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
-        cout << "\nScan completed in " << duration.count()/1000 << " seconds\n";
-
+    
         cout << "\nChoose a file or folder by typing its number or select option below";
-        cout << "\n( 0 ) Return to previuos folder | ( -1 ) select multiple files to delete | ( -2 ) delete all files in this folder | ( -3 ) Exit Program " << endl;
+        cout << "\n( 0 ) Return to previuos folder | ( -1 ) select multiple files to delete | ( -2 ) delete folder | ( -3 ) Exit Program " << endl;
 
         cin >> userInput;
 
@@ -41,7 +37,6 @@ int main()
         //Delete Multiple Files
         if(userInput == -1){
             cout << "Enter the numbers of the files you want to delete, separated by spaces (e.g., 1 3 5): ";
-            cin.ignore();
 
             string line;
             getline(cin, line);
@@ -67,11 +62,15 @@ int main()
             continue;
         }
 
-        //Delete All Files in Folder
+        //Delete Folder
         if(userInput == -2){
-            if(currentDirectory != homeDirectory){
-                deleteAll(currentDirectory);
-            }
+            int folderNumber;
+            cout << "Enter the number of the folder to be deleted: ";
+            cin >> folderNumber;
+
+            // validate folderNumber first
+
+            deleteAll(files[folderNumber - 1].path);
             continue;
         }
 
@@ -90,9 +89,8 @@ int main()
 
         //if folder, go inside folder
         if(selection.isDirectory){
-            cout << "Press 1 to go inside folder, press 2 to delete folder: ";
+           /* cout << "Press 1 to go inside folder, press 2 to delete folder: ";
             cin >> userInput;
-
             if(userInput == 2){
                 deleteAll(selection.path);
                 continue;
@@ -101,7 +99,8 @@ int main()
             }else{
                 cout << "\nInvalid Option" << endl;
             }
-
+            */
+            currentDirectory = selection.path;
         }
 
         //if file, ask user if they want to delete

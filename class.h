@@ -5,7 +5,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
-#include <chrono>
 #include <thread>
 
 using namespace std;
@@ -23,14 +22,12 @@ struct Entry {
 string formatSize(uintmax_t bytes);
 uintmax_t getFolderSize(fs::path path);
 
-
 //Displaying
 void printFolder(const fs::path& path);
 vector<Entry> checkFolder(const fs::path& path);
 void displayFolder( vector<Entry> &files);
 bool shouldSkip(const fs::path& path);
 bool shouldSkipDelete(const fs::path& path);
-
 
 //Deleting
 void deleteAll(fs::path& currentDirectory);

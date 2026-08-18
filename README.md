@@ -37,7 +37,6 @@ Building CleanupPro has helped me become more comfortable with:
 
 This project is still a work in progress. Some features I'd like to add include:
 
-- Multithreadding
 - A GUI interface
 - Move deleted files to the system Trash instead of permanently deleting them
 - Find the largest files on the system

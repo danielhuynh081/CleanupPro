@@ -45,12 +45,17 @@ string formatSize(uintmax_t bytes) {
     const double MB = KB * 1024.0;
     const double GB = MB * 1024.0;
 
+    ostringstream out;
+    out << fixed << setprecision(2);
+
     if (bytes >= GB)
-        return to_string(bytes / GB) + " GB";
+        out << bytes / GB << " GB";
     else if (bytes >= MB)
-        return to_string(bytes / MB) + " MB";
+        out << bytes / MB << " MB";
     else
-        return to_string(bytes / KB) + " KB";
+        out << bytes / KB << " KB";
+
+    return out.str();
 }
 
 
@@ -180,8 +185,8 @@ void printSafeFolders()
     folderCache.clear();
 
     cout << "\n------------------------------------\n";
-    cout << "|      Safe Clean Complete         |" << endl;
-    cout << "|      Space Freed: " << formatSize(totalFreed) << "  |";
+    cout << "       Safe Clean Complete          " << endl;
+    cout << "       Space Freed: " << formatSize(totalFreed);
     cout << "\n------------------------------------\n";
 
 }

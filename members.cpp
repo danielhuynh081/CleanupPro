@@ -1,7 +1,7 @@
 #include "class.h"
 
 
-const vector<fs::path> protectedPaths = {
+const vector<fs::path> protectedPaths {
     homeDirectory / ".Trash",
     homeDirectory / "Library/Application Support",
     homeDirectory / "Library/Containers",
@@ -29,6 +29,15 @@ const vector<fs::path> protectedPaths = {
 const vector<fs::path> dontDelete {
     homeDirectory / "Library"
 };
+const vector<fs::path> safeCleanUp{
+    homeDirectory / "Library/Caches",
+    homeDirectory / "Library/Logs",
+    homeDirectory / ".cache",
+    homeDirectory / "Library/Developer/Xcode/DerivedData",
+    homeDirectory / ".npm/_cacache",    
+    homeDirectory / ".gradle/caches"
+};
+
 unordered_map<fs::path, vector<Entry>> folderCache;
 
 string formatSize(uintmax_t bytes) {
@@ -110,45 +119,73 @@ bool shouldSkipDelete(const fs::path& path)
     return false;
 }
 
-/*Display folder contents as user selects folder
-vector<Entry> checkFolder(const fs::path &path){
-    // Cache first scan
-    auto it = folderCache.find(path);
-    if (it != folderCache.end())
-        return it->second;
-    
-    //Create vector for list of files
-    vector<Entry> files;
+void printSafeFolders()
+{
+    char choice{};
+    uintmax_t totalFreed{0};
 
-    //iterate through directory
-    for(auto const & dir_entry : fs::directory_iterator{path}){
+    cout << "Common folders that take space and are generally safe to clean:\n";
 
-        // cout << dir_entry.path() << endl;
-
-        //ignore trash
-        if(shouldSkip(dir_entry.path()))
-            continue;
-        
-        Entry entry;
-        entry.path = dir_entry.path();
-        entry.isDirectory = dir_entry.is_directory();
-        if(dir_entry.is_regular_file()){
-            entry.size = dir_entry.file_size();
+    for (const auto& folder : safeCleanUp) {
+        if (fs::exists(folder)) {
+            cout << folder
+                 << " | "
+                 << formatSize(getFolderSize(folder))
+                 << '\n';
         }
-        else{
-            entry.size= getFolderSize(dir_entry.path());
-           // idx.size = getFolderSize(dir_entry.path());
-        }
-        files.push_back(entry);
-
     }
-    //Save to cache
-    folderCache[path] = files;
 
-    //Return vector of file and folder paths
-    return files;
+    cout << "Proceed to clean? (y/n): ";
+    cin >> choice;
+
+    if (tolower(choice) != 'y') {
+        cout << "Safe Clean Cancelled.\n";
+        return;
+    }
+
+    for (const auto& folder : safeCleanUp) {
+
+        if (!fs::exists(folder))
+            continue;
+
+        for (const auto& entry : fs::directory_iterator(folder)) {
+
+            // Get size BEFORE deleting
+            uintmax_t entrySize{0};
+
+            if (entry.is_directory())
+                entrySize = getFolderSize(entry.path());
+            else if (entry.is_regular_file())
+                entrySize = entry.file_size();
+
+            std::error_code ec;
+
+            fs::remove_all(entry.path(), ec);
+
+            if (ec) {
+                cout << "Skipped: "
+                     << entry.path()
+                     << " (" << ec.message() << ")\n";
+            }
+            else {
+                totalFreed += entrySize;
+
+                cout << "Deleted: "
+                     << entry.path()
+                     << '\n';
+            }
+        }
+    }
+
+    folderCache.clear();
+
+    cout << "\n------------------------------------\n";
+    cout << "|      Safe Clean Complete         |" << endl;
+    cout << "|      Space Freed: " << formatSize(totalFreed) << "  |";
+    cout << "\n------------------------------------\n";
+
 }
-*/
+
 vector<Entry> checkFolder(const fs::path& path)
 {
     vector<Entry> files;
@@ -295,15 +332,13 @@ void deleteAll(fs::path &currentDirectory){
     }
 
     try {
-        for(auto const & dir_entry : fs::directory_iterator{currentDirectory}){
-                fs::remove_all(dir_entry.path());
-        }
-        
-        fs::remove(currentDirectory);
-        cout << "Folder has been deleted.\n";
-        cin.get();
-        cout << "Press Enter to continue.\n";
 
+        fs::remove_all(currentDirectory);
+        
+        folderCache.clear(); // clear cache
+        cout << "Folder has been deleted.\n";
+        cout << "Press Enter to continue.\n";
+        cin.get();
     }catch(const fs::filesystem_error& e) {
 
         cout << "Could not delete: "
@@ -359,7 +394,7 @@ void deleteFile(const fs::path& path) {
     try {
 
         fs::remove(path);
-
+        folderCache.clear(); // clear cache
         cout << "File deleted.\n";
 
     }

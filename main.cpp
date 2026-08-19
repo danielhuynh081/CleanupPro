@@ -20,9 +20,9 @@ int main()
        
         vector<Entry> files = checkFolder(currentDirectory);
         displayFolder(files);
-    
+        
         cout << "\nChoose a file or folder by typing its number or select option below";
-        cout << "\n( 0 ) Return to previuos folder | ( -1 ) select multiple files to delete | ( -2 ) delete folder | ( -3 ) Exit Program " << endl;
+        cout << "\n( 0 ) Return to previuos folder | ( -1 ) select multiple files to delete | ( -2 ) delete folder | ( -3 ) Safe Clean | ( -4 ) Exit Program" << endl;
 
         cin >> userInput;
 
@@ -71,11 +71,20 @@ int main()
             // validate folderNumber first
 
             deleteAll(files[folderNumber - 1].path);
+            fs::remove(files[folderNumber - 1].path);
+
+
+            continue;
+        }
+
+        //Safe Clean
+        if(userInput == -3){
+            printSafeFolders();
             continue;
         }
 
         //Exit program
-        if(userInput == -3)
+        if(userInput == -4)
             break;
 
         //Error Handling

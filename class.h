@@ -28,6 +28,7 @@ vector<Entry> checkFolder(const fs::path& path);
 void displayFolder( vector<Entry> &files);
 bool shouldSkip(const fs::path& path);
 bool shouldSkipDelete(const fs::path& path);
+void printSafeFolders();
 
 //Deleting
 void deleteAll(fs::path& currentDirectory);

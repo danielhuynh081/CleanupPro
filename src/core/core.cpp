@@ -1,4 +1,4 @@
-#include "class.h"
+#include "cleanuppro/core.h"
 
 
 const vector<fs::path> protectedPaths {

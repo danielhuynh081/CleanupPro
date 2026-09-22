@@ -42,6 +42,20 @@ This project is still a work in progress. Some features I'd like to add include:
 - Find the largest files on the system
 - Search for files over a user-defined size
 
+## Project Structure
+
+```
+CleanupPro/
+├── CMakeLists.txt
+├── include/cleanuppro/
+│   └── core.h          # Shared declarations (Entry, scanning, deleting)
+├── src/
+│   ├── core/core.cpp   # Shared logic used by both front ends
+│   ├── cli/main.cpp    # Terminal interface
+│   └── gui/            # Qt GUI (gui.h, gui.cpp)
+└── README.md
+```
+
 ## Running the Project
 
 Clone the repository:
@@ -51,20 +65,21 @@ git clone https://github.com/danielhuynh081/CleanupPro.git
 cd CleanupPro
 ```
 
-Compile:
+Build (the GUI is built too if Qt6 is installed, e.g. `brew install qt`):
 
 ```bash
-g++ -std=c++17 main.cpp members.cpp -o CleanupPro
+cmake -S . -B build -DCMAKE_PREFIX_PATH=/opt/homebrew
+cmake --build build
 ```
 
-or use the makefile by typing
+Run the terminal version:
 
 ```bash
-make
+./build/cleanuppro
 ```
 
-Run:
+Run the GUI:
 
 ```bash
-./main
+./build/cleanuppro_gui
 ```

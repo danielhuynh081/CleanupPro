@@ -5,7 +5,7 @@
 // 1. learn how to iterate through directories and files using std::filesystem
 // 2. make a function that takes a directory path and iterates through it, printing out the size of each file and folder
 // 3. make the program run so a user can pick which folder they want to irate through
-#include "cleanuppro/core.h"
+#include "functions.h"
 
 
 int main()

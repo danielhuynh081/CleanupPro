@@ -20,7 +20,7 @@
 #include <QtConcurrent>
 #include <algorithm>
 
-#include "cleanuppro/core.h"
+#include "functions.h"
 
 class MainWindow : public QMainWindow
 {

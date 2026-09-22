@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Functions 
-add_library(cleanuppro_core STATIC src/core/core.cpp)
+add_library(cleanuppro_core STATIC src/functions/functions.cpp)
 target_include_directories(cleanuppro_core PUBLIC include)
 target_compile_options(cleanuppro_core PRIVATE
     -Wall -Wshadow -Wunreachable-code -Wredundant-decls -Wmissing-declarations

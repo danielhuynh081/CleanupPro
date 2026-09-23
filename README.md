@@ -68,7 +68,10 @@ cd CleanupPro
 Build (the GUI is built too if Qt6 is installed, e.g. `brew install qt`):
 
 ```bash
-cmake -S . -B build -DCMAKE_PREFIX_PATH=/opt/homebrew
+# Configure the project and generate build files in build/
+cmake -S . -B build
+
+# Compile project
 cmake --build build
 ```
 
